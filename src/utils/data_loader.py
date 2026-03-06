@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow     # only used to get rid of error on gradescope
 from keras.datasets import mnist, fashion_mnist
 
 def load_data(dataset):
