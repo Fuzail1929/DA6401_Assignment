@@ -1,0 +1,55 @@
+program: train.py
+method: random
+command:
+  - ${env}
+  - python3
+  - ${program}
+  - ${args}
+  
+metric:
+  name: val_accuracy
+  goal: maximize
+
+parameters:
+
+  dataset:
+    values: ["mnist"]
+
+  epochs:
+    values: [5]
+
+  batch_size:
+    values: [64]
+
+  loss:
+    values: ["cross_entropy"]
+
+  learning_rate:
+    values: [0.1, 0.01, 0.001]
+
+  optimizer:
+    values: ["sgd", "momentum", "nag", "rmsprop"]
+
+  hidden_size:
+    values:
+      - [128]
+      - [128, 64]
+      - [128, 128]
+
+  activation:
+    values: ["relu", "tanh", "sigmoid"]
+
+  weight_init:
+    values: ["random", "xavier"]
+
+  weight_decay:
+    values: [0.0]
+
+  model_save_path:
+    values: ["models/sweep_model.npy"]
+
+  wandb_project:
+    values: ["dl_assignment"]
+
+  wandb_group:
+    values: ["sweep_exp"]
