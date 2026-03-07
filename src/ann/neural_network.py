@@ -29,7 +29,9 @@ class NeuralNetwork:
             "nag": NAG,
             "rmsprop": RMSProp,
         }
-
+        # ensure activation is a list
+        if isinstance(cli_args.activation, str):
+            cli_args.activation = [cli_args.activation] * cli_args.num_layers
         sizes = [784] + cli_args.hidden_size + [10]
 
         self.layers = []
