@@ -18,34 +18,41 @@ def parse_arguments():
     parser.add_argument("-d", "--dataset",
                         type=str,
                         required=True,
+                        default = "mnist" ,
                         choices=["mnist", "fashion_mnist"])
 
     # Training hyperparameters
     parser.add_argument("-e", "--epochs",
                         type=int,
+                        default = '5',
                         required=True)
 
     parser.add_argument("-b", "--batch_size",
                         type=int,
+                        default = 64,
                         required=True)
 
     parser.add_argument("-lr", "--learning_rate",
                         type=float,
+                        default = '0.01',
                         required=True)
 
     parser.add_argument("-wd", "--weight_decay",
                         type=float,
-                        default=0.0)
+                        default =0.0,
+                        )
 
     # Optimizer
     parser.add_argument("-o", "--optimizer",
                         type=str,
                         required=True,
+                        default = "rmsprop",
                         choices=["sgd", "momentum", "nag", "rmsprop"])
 
     # Architecture
     parser.add_argument("-nhl", "--num_layers",
                         type=int,
+                        default ="1",
                         required=True)
 
     parser.add_argument("-sz", "--hidden_size",
@@ -57,42 +64,48 @@ def parse_arguments():
                         type=str,
                         nargs="+",
                         required=True,
+                        default='relu',
                         choices=["relu", "sigmoid", "tanh"])
 
     # Loss
     parser.add_argument("-l", "--loss",
                         type=str,
                         required=True,
+                        default = "cross_entropy",
                         choices=["cross_entropy", "mse"])
 
     # Weight init
     parser.add_argument("-w_i", "--weight_init",
                         type=str,
                         required=True,
+                        default = "xavier",
                         choices=["random", "xavier"])
 
     # W&B
     parser.add_argument("--wandb_project",
                     type=str,
-                    default="dl_assignment")
+                    default="dl_assignment"
+                    )
 
     # Model save path (relative)
     parser.add_argument("--model_save_path",
                         type=str,
-                        required=True)
+                        default="best_model.npy")
 
-    parser.add_argument("--wandb_group",
-                    type=str,
-                    default="experiment_1")
-    
+    parser.add_argument(
+                "--wandb_group",
+                type=str ,
+                default="experiment_1"
+)
     return parser.parse_args()
 
 
 
 def main():
     args = parse_arguments()
-    if isinstance(args.activation, str):
-        args.activation = [args.activation] * args.num_layers
+    
+    if len(args.activation) == 1:
+        args.activation = args.activation * args.num_layers
 
     if len(args.hidden_size) != args.num_layers:
         raise ValueError("hidden_size list must match num_layers")
@@ -106,7 +119,7 @@ def main():
 )   
 
 
-    X_train, y_train, X_test, y_test = load_data(args.dataset)
+    X_train, y_train, _, _ = load_data(args.dataset)
     
     class DummyArgs:
         pass
@@ -135,12 +148,13 @@ def main():
     )
     
 
-    weights = np.array(
-        [(l.W, l.b) for l in model.layers],
-        dtype=object
-    )
+    weights = model.get_weights()
 
-    os.makedirs(os.path.dirname(args.model_save_path), exist_ok=True)
+    dir_path = os.path.dirname(args.model_save_path)
+
+    if dir_path != "":
+        os.makedirs(dir_path, exist_ok=True)
+
     np.save(args.model_save_path, weights, allow_pickle=True)
     
     wandb.finish()
