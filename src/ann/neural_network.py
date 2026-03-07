@@ -29,10 +29,13 @@ class NeuralNetwork:
             "nag": NAG,
             "rmsprop": RMSProp,
         }
-        # ensure activation is a list
-        if isinstance(cli_args.activation, str):
-            cli_args.activation = [cli_args.activation] * cli_args.num_layers
-        sizes = [784] + cli_args.hidden_size + [10]
+        hidden = cli_args.hidden_size
+
+        if not isinstance(hidden, list):
+            hidden = [hidden]
+
+        sizes = [784] + hidden + [10]
+        #sizes = [784] + cli_args.hidden_size + [10]
 
         self.layers = []
         self.activations = []
@@ -45,7 +48,10 @@ class NeuralNetwork:
                 NeuralLayer(sizes[i], sizes[i+1], cli_args.weight_init)
             )
             if i < len(sizes) - 2:
-                self.activations.append(act_map[cli_args.activation[i]]())
+                act = cli_args.activation
+                if isinstance(act, str):
+                    act = [act] * (len(sizes) - 2)
+                self.activations.append(act_map[act[i]]())
 
         self.loss_fn = (
             CrossEntropy()
@@ -121,7 +127,7 @@ class NeuralNetwork:
             epoch_loss = 0
             batches = 0
 
-            iteration_count =0
+            
 
             for i in range(0, n, batch_size):
 
