@@ -16,45 +16,58 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description='Run inference on test set')
 
-    parser.add_argument("-m", "--model_path", type=str, required=True)
+    parser.add_argument("-m", "--model_path", type=str, default="best_model.npy")
 
     parser.add_argument("-d", "--dataset",
                         choices=["mnist", "fashion_mnist"],
-                        required=True)
+                        default="mnist",
+                        )
 
     parser.add_argument("-b", "--batch_size",
-                        type=int, required=True)
+                        default=64,
+                        type=int)
 
     parser.add_argument("-sz", "--hidden_layers",
-                        nargs="+", type=int, required=True)
+                        nargs="+", 
+                        type=int, 
+                        default = [128]
+                        )
 
     parser.add_argument("-nhl", "--num_neurons",
-                        type=int, required=True)
+                        type=int,
+                        default  = 1
+                        )
 
     parser.add_argument("-a", "--activation",
                     nargs="+",
                     choices=["relu", "sigmoid", "tanh"],
-                    required=True)
+                    default = 'relu'
+                    )
     
     parser.add_argument("-o", "--optimizer",
-                        choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"],
-                        required=True)
+                        choices=["sgd", "momentum", "nag", "rmsprop"],
+                        default = "rmsprop",
+                        )
 
     parser.add_argument("-l", "--loss",
                         choices=["cross_entropy", "mse"],
-                        required=True)
+                        default = "cross_entropy",
+                        )
 
     parser.add_argument("-w_i", "--weight_init",
                         choices=["random", "xavier"],
-                        required=True)
+                        default = "random",
+                        )
 
     parser.add_argument("-lr", "--learning_rate",
                         type=float,
-                        required=True)
+                        default=0.01,
+                        )
 
     parser.add_argument("-wd", "--weight_decay",
                         type=float,
                         default=0)
+    
     parser.add_argument("--wandb_project",
                     type=str,
                     default="dl_assignment")
@@ -109,13 +122,18 @@ def evaluate_model(model, X_test, y_test):
 def main():
     args = parse_arguments()
 
+    args.hidden_size = args.hidden_layers
+    args.num_layers = len(args.hidden_layers)
+
     wandb.init(
     project=args.wandb_project,
     group=args.wandb_group,
     name="inference"  
 )
 
-    assert len(args.hidden_layers) == args.num_neurons
+    if len(args.activation) == 1:
+        args.activation = args.activation * args.num_layers
+
 
     _, _, X_test, y_test = load_data(args.dataset)
 
@@ -124,6 +142,7 @@ def main():
 
     cli_args = DummyArgs()
     cli_args.hidden_size = args.hidden_layers
+    cli_args.num_layers = len(args.hidden_layers)
     cli_args.activation = args.activation
     cli_args.weight_init = args.weight_init
     cli_args.loss = args.loss
