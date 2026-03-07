@@ -227,3 +227,6 @@ This project implements core deep learning concepts:
 
 # W&B Report Link: 
 https://wandb.ai/ch22b080-iit-madras/dl_assignment/reports/DA6401_Assignment_1---VmlldzoxNjA0NTg3Mg?accessToken=wnupe1a5zqhu2hqx19z40cunkq8e53f3bwtdxdvjwmvg5213h2l0z4i457tm4auo
+
+# Github Repository 
+https://github.com/Fuzail1929/DA6401_Assignment.git
